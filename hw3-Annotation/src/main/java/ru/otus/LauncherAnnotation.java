@@ -31,9 +31,13 @@ public class LauncherAnnotation {
             }
         }
 
-        launcherBefore(clazz, before);
-        launcherTest(clazz, test);
-        launcherAfter(clazz, after);
+        List<Method> methods = new ArrayList<>();
+        methods.addAll(before);
+        methods.addAll(test);
+        methods.addAll(after);
+
+        launcher(clazz, methods);
+
 
         System.out.println("Всего тестов: " + all);
         System.out.println("Успешные тесты: " + pass);
@@ -41,7 +45,7 @@ public class LauncherAnnotation {
 
     }
 
-    public void launcherBefore(Class<?> clazz, List<Method> methods) {
+    public void launcher(Class<?> clazz, List<Method> methods) {
         for (Method method : methods) {
             try {
                 method.invoke(clazz.getDeclaredConstructor().newInstance());
@@ -52,27 +56,5 @@ public class LauncherAnnotation {
         }
     }
 
-    public void launcherTest(Class<?> clazz, List<Method> methods) {
-        for (Method method : methods) {
-            try {
-                method.invoke(clazz.getDeclaredConstructor().newInstance());
-                pass++;
-            } catch (Exception e) {
-                fail++;
-            }
 
-        }
-    }
-
-    public void launcherAfter(Class<?> clazz, List<Method> methods) {
-        for (Method method : methods) {
-            try {
-                method.invoke(clazz.getDeclaredConstructor().newInstance());
-                pass++;
-            } catch (Exception e) {
-                fail++;
-            }
-        }
-
-    }
 }
