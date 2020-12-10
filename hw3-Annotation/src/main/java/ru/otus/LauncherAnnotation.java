@@ -9,52 +9,71 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class LauncherAnnotation {
-    int all = 0;
-    int pass = 0;
-    int fail = 0;
+    private List<Method> before = new ArrayList<>();
+    private List<Method> after = new ArrayList<>();
+    private List<Method> test = new ArrayList<>();
 
-    public void launcher(Class<?> clazz)  {
-        List<Method> before = new ArrayList<>();
-        List<Method> test = new ArrayList<>();
-        List<Method> after = new ArrayList<>();
+    private int pass = 0;
+    private int fail = 0;
 
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(Before.class)) {
-                before.add(method);
-                all++;
-            } else if (method.isAnnotationPresent(Test.class)) {
-                test.add(method);
-                all++;
-            } else if (method.isAnnotationPresent(After.class)) {
-                after.add(method);
-                all++;
+    public void launcher(Class<?> clazz) throws Exception {
+        distributor(clazz);
+
+        if (test.size() != 0) {
+            for (Method method : test) {
+                launcher(clazz, method);
             }
         }
 
-        List<Method> methods = new ArrayList<>();
-        methods.addAll(before);
-        methods.addAll(test);
-        methods.addAll(after);
-
-        launcher(clazz, methods);
-
-
-        System.out.println("Всего тестов: " + all);
+        System.out.println("Всего тестов: " + (pass + fail));
         System.out.println("Успешные тесты: " + pass);
         System.out.println("Не успешные тесты: " + fail);
 
     }
 
-    public void launcher(Class<?> clazz, List<Method> methods) {
-        for (Method method : methods) {
-            try {
-                method.invoke(clazz.getDeclaredConstructor().newInstance());
-                pass++;
-            } catch (Exception e) {
-                fail++;
+    private void distributor(Class<?> clazz) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(Before.class)) {
+                before.add(method);
+            } else if (method.isAnnotationPresent(Test.class)) {
+                test.add(method);
+            } else if (method.isAnnotationPresent(After.class)) {
+                after.add(method);
             }
         }
     }
 
+    private void launcher(Class<?> clazz, Method testMethod) throws Exception {
+        Object instance = clazz.getConstructor().newInstance();
+
+        if (before.size() != 0) {
+            for (Method method : before) {
+                try {
+                    method.invoke(instance);
+                    pass++;
+                } catch (Exception e) {
+                    fail++;
+                }
+            }
+        }
+
+        try {
+            testMethod.invoke(instance);
+            pass++;
+        } catch (Exception e) {
+            fail++;
+        }
+
+        if (after.size() != 0) {
+            for (Method method : after) {
+                try {
+                    method.invoke(instance);
+                    pass++;
+                } catch (Exception e) {
+                    fail++;
+                }
+            }
+        }
+    }
 
 }

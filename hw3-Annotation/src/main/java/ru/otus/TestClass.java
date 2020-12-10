@@ -5,6 +5,7 @@ import ru.otus.annotation.Before;
 import ru.otus.annotation.Test;
 
 public class TestClass {
+
     @Before
     public void before() {
         System.out.println("Before method");
@@ -34,5 +35,6 @@ public class TestClass {
     @After
     public void after() {
         System.out.println("After method");
+        System.out.println("----------------\n");
     }
 }
