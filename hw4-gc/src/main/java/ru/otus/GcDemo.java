@@ -9,10 +9,14 @@ import javax.management.ObjectName;
 import javax.management.openmbean.CompositeData;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class GcDemo {
+    private static final Map<String, Integer> statistics = new HashMap<>();
+
     public static void main(String... args) throws Exception {
         System.out.println("Starting pid: " + ManagementFactory.getRuntimeMXBean().getName());
         switchOnMonitoring();
@@ -29,17 +33,23 @@ public class GcDemo {
         mbean.setSize(size);
         mbean.run();
 
-        System.out.println("time:" + (System.currentTimeMillis() - beginTime) / 1000);
+        long duration = (System.currentTimeMillis() - beginTime) / 1000;
+        System.out.println("time:" + duration + " sec");
+        System.out.println("number of iteration completed:" + mbean.getNumberOfIterationCompleted());
+
+        statistics.forEach((k, v) -> System.out.printf("number of [%s] is [%d]%n", k, v));
+        statistics.forEach((k, v) -> System.out.printf("number of [%s] per minute is [%d]%n", k, v * 60 / duration));
     }
 
     private static void switchOnMonitoring() {
-        List<GarbageCollectorMXBean> gcbeans = ManagementFactory.getGarbageCollectorMXBeans();
+        List<GarbageCollectorMXBean> gcbeans = java.lang.management.ManagementFactory.getGarbageCollectorMXBeans();
         for (GarbageCollectorMXBean gcbean : gcbeans) {
             System.out.println("GC name:" + gcbean.getName());
             NotificationEmitter emitter = (NotificationEmitter) gcbean;
             NotificationListener listener = (notification, handback) -> {
                 if (notification.getType().equals(GarbageCollectionNotificationInfo.GARBAGE_COLLECTION_NOTIFICATION)) {
-                    GarbageCollectionNotificationInfo info = GarbageCollectionNotificationInfo.from((CompositeData) notification.getUserData());
+                    GarbageCollectionNotificationInfo info =
+                            GarbageCollectionNotificationInfo.from((CompositeData) notification.getUserData());
                     String gcName = info.getGcName();
                     String gcAction = info.getGcAction();
                     String gcCause = info.getGcCause();
@@ -47,6 +57,7 @@ public class GcDemo {
                     long startTime = info.getGcInfo().getStartTime();
                     long duration = info.getGcInfo().getDuration();
 
+                    statistics.compute(gcName, (k, v) -> v == null ? 1 : v + 1);
                     System.out.println("start:" + startTime + " Name:" + gcName + ", action:" + gcAction + ", gcCause:" + gcCause + "(" + duration + " ms)");
                 }
             };
