@@ -1,34 +1,24 @@
 package ru.otus.listener.homework;
 
-import ru.otus.model.Message;
-
 public class State {
-    private Message oldMsg;
-    private Message newMsg;
+    private final MessageHistory messageHistory;
 
-    public State(Message oldMsg, Message newMsg) {
-        this.oldMsg = oldMsg;
-        this.newMsg = newMsg;
+    public State(MessageHistory messageHistory) {
+        this.messageHistory = messageHistory;
     }
 
     public State(State state) {
-        this.oldMsg = state.getOldMsg();
-        this.newMsg = state.getNewMsg();
+        this.messageHistory = new MessageHistory(state.getMessageHistory());
     }
 
-    public Message getOldMsg() {
-        return oldMsg;
-    }
-
-    public Message getNewMsg() {
-        return newMsg;
+    public MessageHistory getMessageHistory() {
+        return messageHistory;
     }
 
     @Override
     public String toString() {
         return "State{" +
-                "oldMsg=" + oldMsg +
-                ", newMsg=" + newMsg +
+                "messageHistory=" + messageHistory +
                 '}';
     }
 }

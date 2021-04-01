@@ -8,19 +8,15 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 public class HistoryListener implements Listener {
+
     private final Deque<Memento> stack = new ArrayDeque<>();
-
-    private final LocalDateTime dateTime;
-
-    public HistoryListener(LocalDateTime dateTime) {
-        this.dateTime = dateTime;
-    }
 
     @Override
     public void onUpdated(Message oldMsg, Message newMsg) {
-        State state = new State(oldMsg, newMsg);
-        System.out.println(state);
-        stack.push(new Memento(state, dateTime));
+        MessageHistory messageHistory = new MessageHistory(oldMsg, newMsg);
+        State state = new State(messageHistory);
+        Memento memento = new Memento(state, LocalDateTime.now());
+        stack.push(memento);
     }
 
     public State restoreState() {

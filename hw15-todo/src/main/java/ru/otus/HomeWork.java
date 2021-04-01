@@ -2,6 +2,7 @@ package ru.otus;
 
 import ru.otus.handler.ComplexProcessor;
 import ru.otus.listener.homework.HistoryListener;
+import ru.otus.listener.homework.State;
 import ru.otus.model.Message;
 import ru.otus.model.ObjectForMessage;
 import ru.otus.processor.homework.ChangeProcessor;
@@ -28,10 +29,10 @@ public class HomeWork {
          */
 
         var processors = List.of(new ChangeProcessor(),
-                new EvenSecondExceptionProcessor(LocalDateTime.now()));
+                new EvenSecondExceptionProcessor(LocalDateTime::now));
 
         var complexProcessor = new ComplexProcessor(processors, (ex) -> System.out.println(ex.getMessage()));
-        var listener = new HistoryListener(LocalDateTime.now());
+        var listener = new HistoryListener();
         complexProcessor.addListener(listener);
 
         var message = new Message.Builder(1L)
@@ -47,6 +48,12 @@ public class HomeWork {
 
         var result = complexProcessor.handle(message);
         System.out.println("result:" + result);
+
+        State state = listener.restoreState();
+        //System.out.println("----" + state.getNewMsg());
+
+        message.getField13().setData(List.of("AnyData2"));
+        //System.out.println("----" + state.getNewMsg());
 
         complexProcessor.removeListener(listener);
     }

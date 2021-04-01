@@ -105,7 +105,7 @@ class ComplexProcessorTest {
         var message = new Message.Builder(1L).build();
 
         var processor =
-                spy(new EvenSecondExceptionProcessor(LocalDateTime.now().withSecond(2)));
+                spy(new EvenSecondExceptionProcessor(() -> LocalDateTime.now().withSecond(2)));
 
         var complexProcessor = new ComplexProcessor(Collections.singletonList(processor), (ex) -> {
             throw new TestException(ex.getMessage());
@@ -128,7 +128,7 @@ class ComplexProcessorTest {
                 .field12("field12")
                 .build();
 
-        var listener = spy(new HistoryListener(LocalDateTime.now()));
+        var listener = spy(new HistoryListener());
 
         var processor = spy(new ChangeProcessor());
 
