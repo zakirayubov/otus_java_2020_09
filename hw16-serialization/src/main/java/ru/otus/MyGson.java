@@ -18,6 +18,10 @@ public class MyGson {
     }
 
     public String toJson(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+
         List<Field> fields = Arrays.stream(obj.getClass().getDeclaredFields()).filter(field -> !(isStatic(field.getModifiers()))).collect(Collectors.toList());
         if (fields.isEmpty()) {
             return obj.toString();
