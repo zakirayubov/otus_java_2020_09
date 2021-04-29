@@ -1,0 +1,6 @@
+docker run --rm --name pg-docker \
+-e POSTGRES_USER=user \
+-e POSTGRES_PASSWORD=admin \
+-e POSTGRES_DB=homeWorkDB \
+-p 5432:5432 \
+postgres:12
