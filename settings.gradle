@@ -6,4 +6,6 @@ include 'hw5-log'
 include 'hw12-solid'
 include 'hw15-todo'
 include 'hw16-serialization'
+include 'hw29-executors'
+include 'hw29-executors'
 
